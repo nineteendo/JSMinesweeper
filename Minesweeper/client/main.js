@@ -941,7 +941,7 @@ function renderTiles(tiles) {
                 tileType -= board.adjacentFlagsPlaced(tile);
             }
         }
-        draw(tile.x, tile.y, tileType);
+        draw(ctx, tile.x, tile.y, tileType);
     }
 
 
@@ -2328,7 +2328,7 @@ function placeAnalysisQuery() {
 }
 
 // draw a tile to the canvas
-function draw(x, y, tileType) {
+function draw(ctx, x, y, tileType) {
 
     //console.log('Drawing image...');
 
@@ -2555,17 +2555,17 @@ function on_click(event) {
 
                         // if it's a lethal chord then let the game end normally
                         if (!lethalChord && uncertainChords.length > 0 && board.hasSafeTile()) {
-                            board.setGameLost();
+                            // board.setGameLost();
 
                             //renderHints(board.getSafeTiles(), [], false);
                             for (let uncertainTile of uncertainChords) {
-                                uncertainTile.setSkull(true);
-                                //draw(uncertainTile.x, uncertainTile.y, SKULL);
+                                // uncertainTile.setSkull(true);
+                                draw(ctxHints, uncertainTile.x, uncertainTile.y, SKULL);
                             }
 
-                            renderTiles(uncertainChords);
+                            // renderTiles(uncertainChords);
 
-                            showMessage("Hard Core: Game is lost because you guessed (by chording) when there were safe tiles!");
+                            showMessage("Hard Core: You can't guess (by chording) when there are safe tiles!");
                             console.log("Chord is not hardcore valid");
 
                             return;
@@ -2585,14 +2585,14 @@ function on_click(event) {
                 // if playing hardcore and we click a non-certain tile when there is a certain safe tile
                 // if the tile is a mine let it fail normally
                 if (docHardcore.checked && tile.getHasHint() && tile.probability != 1 && tile.probability != 0 && board.hasSafeTile()) {
-                    board.setGameLost();
+                    // board.setGameLost();
 
                     //renderHints(board.getSafeTiles(), [], false);
-                    tile.setSkull(true);
-                    renderTiles([tile]);
+                    // tile.setSkull(true);
+                    // renderTiles([tile]);
 
-                    //draw(tile.x, tile.y, SKULL);
-                    showMessage("Hard Core: Game is lost because you guessed when there were safe tiles!");
+                    draw(ctxHints, tile.x, tile.y, SKULL);
+                    showMessage("Hard Core: You can't guess when there are safe tiles!");
                     console.log("Move is not hardcore valid");
 
                     return;
