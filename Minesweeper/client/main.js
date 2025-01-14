@@ -428,6 +428,7 @@ function propertiesClose() {
 
     BruteForceGlobal.PRUNE_BF_ANALYSIS = document.getElementById("pruneBruteForce").checked;
 
+    SolverGlobal.EARLY_FIFTY_FIFTY_CHECKING = document.getElementById("early5050").checked;
     SolverGlobal.CALCULATE_LONG_TERM_SAFETY = document.getElementById("useLTR").checked;
     SolverGlobal.PRUNE_GUESSES = document.getElementById("pruneGuesses").checked;
 
@@ -455,6 +456,7 @@ function propertiesOpen() {
 
     document.getElementById("pruneBruteForce").checked = BruteForceGlobal.PRUNE_BF_ANALYSIS;
 
+    document.getElementById("early5050").checked = SolverGlobal.EARLY_FIFTY_FIFTY_CHECKING;
     document.getElementById("useLTR").checked = SolverGlobal.CALCULATE_LONG_TERM_SAFETY;
     document.getElementById("pruneGuesses").checked = SolverGlobal.PRUNE_GUESSES;
 
@@ -481,6 +483,7 @@ function saveSettings() {
     settings.version = SETTINGS_VERSION;
     settings.pruneBruteForce = BruteForceGlobal.PRUNE_BF_ANALYSIS;
     settings.pruneGuesses = SolverGlobal.PRUNE_GUESSES;
+    settings.early5050 = SolverGlobal.EARLY_FIFTY_FIFTY_CHECKING;
     settings.useLTR = SolverGlobal.CALCULATE_LONG_TERM_SAFETY;
 
     settings.maxAnalysisBfSolutions = BruteForceGlobal.ANALYSIS_BFDA_THRESHOLD;
@@ -509,6 +512,10 @@ function loadSettings() {
 
     if (settings.pruneGuesses != null) {
         SolverGlobal.PRUNE_GUESSES = settings.pruneGuesses;
+    }
+
+    if (settings.early5050 != null) {
+        SolverGlobal.EARLY_FIFTY_FIFTY_CHECKING = settings.early5050;
     }
 
     if (settings.useLTR != null) {
@@ -2267,14 +2274,10 @@ async function doAnalysis(fullBFDA) {
             options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY; 
         } 
 
-        if (docOverlay.value != "none") {
-            options.fullProbability = true;
-        } else {
-            options.fullProbability = false;
-        }
-
+        options.fullProbability = true;
         options.guessPruning = guessAnalysisPruning;
         options.fullBFDA = fullBFDA;
+        options.hardcore = docHardcore.checked;
 
         const solve = await solver(board, options);  // look for solutions
         const hints = solve.actions;
@@ -3126,11 +3129,8 @@ async function handleSolver(solverStart, headerId) {
             options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY;
         } 
 
-        if (docOverlay.value != "none" || docHardcore.checked) {
-            options.fullProbability = true;
-        } else {
-            options.fullProbability = false;
-        }
+        options.fullProbability = true;
+        options.hardcore = docHardcore.checked;
 
         let hints;
         let other;
