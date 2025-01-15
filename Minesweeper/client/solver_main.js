@@ -418,11 +418,11 @@ async function solver(board, options) {
                                 }
                             }
 
-                            return addDeadTiles(result, deadTiles);
+                            return addDeadTiles(result, deadTiles, pe.minesFound);
                         }
                     }
                 }
-                result = addDeadTiles(result, pe.getDeadTiles());
+                result = addDeadTiles(result, pe.getDeadTiles(), pe.minesFound);
             }
 
             return result;
