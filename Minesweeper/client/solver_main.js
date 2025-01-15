@@ -431,7 +431,7 @@ async function solver(board, options) {
 
         for (let tile of pe.minesFound) {   // place each found flag
             tile.setProbability(0);
-            tile.setFoundBomb();
+            //tile.setFoundBomb();
             //if (options.playStyle == PLAY_STYLE_FLAGS) {
                 const action = new Action(tile.getX(), tile.getY(), 0, ACTION_FLAG);
                 result.push(action);
@@ -451,14 +451,14 @@ async function solver(board, options) {
             // find some witnesses which can be adjusted to remove the guessing
             findBalancingCorrections(pe);
 
-            return result;
+            return addDeadTiles(result, pe.getDeadTiles(), pe.minesFound);
         }
 
         // if we aren't allowing advanced guessing then stop here
         if (!options.advancedGuessing) {
             writeToConsole("Advanced guessing is turned off so exiting the solver after the probability engine");
             showMessage("Press 'Analyse' for advanced guessing");
-            return result;
+            return addDeadTiles(result, pe.getDeadTiles(), pe.minesFound);
         }
 
         /*
@@ -534,7 +534,7 @@ async function solver(board, options) {
                         deadTiles.push(deadTile);
                     }
                 }
-                return addDeadTiles(result, deadTiles);
+                return addDeadTiles(result, deadTiles, pe.minesFound);
             }
 
         }
@@ -593,7 +593,7 @@ async function solver(board, options) {
                     deadTiles = allCoveredTiles;   // all the tiles are dead
                 }
 
-                return addDeadTiles(result, deadTiles);
+                return addDeadTiles(result, deadTiles, pe.minesFound);
             } else {
                 deadTiles = pe.getDeadTiles();  // use the dead tiles from the probability engine
                 partialBFDA = bfda;
@@ -639,7 +639,7 @@ async function solver(board, options) {
                     showMessage(recommended.asText() + " is an unavoidable 50/50 guess, or safe." + formatSolutions(pe.finalSolutionsCount));
                 }
                 //showMessage(recommended.asText() + " is an unavoidable 50/50 guess, or safe." + formatSolutions(pe.finalSolutionsCount));
-                return addDeadTiles(result, pe.getDeadTiles());
+                return addDeadTiles(result, pe.getDeadTiles(), pe.minesFound);
             }
         }
 
@@ -665,7 +665,7 @@ async function solver(board, options) {
                     showMessage(recommended.asText() + " is an unavoidable 50/50 guess, or safe." + formatSolutions(pe.finalSolutionsCount));
                 }
 
-                return addDeadTiles(result, pe.getDeadTiles());
+                return addDeadTiles(result, pe.getDeadTiles(), pe.minesFound);
             }
         }
 
@@ -729,13 +729,17 @@ async function solver(board, options) {
 
         }
 
-        //return addDeadTiles(result, pe.getDeadTiles());
-        return addDeadTiles(result, deadTiles);
+        return addDeadTiles(result, deadTiles, pe.minesFound);
 
     }
 
     // used to add the dead tiles to the results
-    function addDeadTiles(result, deadTiles) {
+    // also used to mark the found mines
+    function addDeadTiles(result, deadTiles, mines) {
+
+        for (let tile of mines) {   //mark each found mine
+            tile.setFoundBomb();
+        }
 
         // identify the dead tiles
         for (let tile of deadTiles) {   // show all dead tiles 
