@@ -138,7 +138,6 @@ class Tile {
 		this.winRate = 0;
 		this.winRateText = "";
 		this.zeroPoison = false;
-		this.colored = false;
     }
 
 	setOnEdge() {
