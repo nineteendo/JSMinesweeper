@@ -1158,7 +1158,7 @@ async function playAgain() {
         showMessage("Replay game requested");
         document.getElementById("newGameSmiley").src = 'resources/images/face.svg';
 
-        if (!analysisMode && (autoPlayCheckBox.checked || docHardcore.checked)) {
+        if (!analysisMode && (autoPlayCheckBox.checked || showProbabilitiesCheckbox.checked || docHardcore.checked)) {
             await startSolver();
         }
     } else {
@@ -1288,7 +1288,7 @@ async function newGameFromMBF(mbf) {
     //showMessage("Game "  + width + "x" + height + "/" + mines + " created from MBF file");
     document.getElementById("newGameSmiley").src = 'resources/images/face.svg';
  
-    if (!analysisMode && autoPlayCheckBox.checked && acceptGuessesCheckBox.checked) {
+    if (!analysisMode && (autoPlayCheckBox.checked && acceptGuessesCheckBox.checked || showProbabilitiesCheckbox.checked)) {
         await startSolver();
     }
  
@@ -1438,7 +1438,7 @@ async function newBoardFromString(data, inflate, analyse) {
 
     document.getElementById("newGameSmiley").src = 'resources/images/face.svg';
 
-    if (!analysisMode && autoPlayCheckBox.checked && acceptGuessesCheckBox.checked) {
+    if (!analysisMode && (autoPlayCheckBox.checked && acceptGuessesCheckBox.checked || showProbabilitiesCheckbox.checked)) {
         await startSolver();
     }
 
@@ -1555,7 +1555,7 @@ async function newGame(width, height, mines, seed, analyse) {
     showMessage("New game requested with width " + width + ", height " + height + " and " + mines + " mines.");
     document.getElementById("newGameSmiley").src = 'resources/images/face.svg';
 
-    if (!analysisMode && analyse && autoPlayCheckBox.checked && acceptGuessesCheckBox.checked) {
+    if (!analysisMode && analyse && (autoPlayCheckBox.checked && acceptGuessesCheckBox.checked || showProbabilitiesCheckbox.checked)) {
         await startSolver();
     }
 
