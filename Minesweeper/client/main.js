@@ -456,6 +456,7 @@ function propertiesClose() {
         doAnalysis(false)
     } else {
         renderHints([]);
+        justPressedAnalyse = false;
     }
 
 }
@@ -1843,6 +1844,7 @@ async function updateHints() {
         await doAnalysis(false);
     } else {
         renderHints([]);
+        justPressedAnalyse = false;
     }
 }
 
@@ -1862,6 +1864,7 @@ async function changeTileSize(analyse) {
         await doAnalysis(false);
     } else {
         renderHints([]);
+        justPressedAnalyse = false;
     }
 
 }
@@ -2590,7 +2593,7 @@ async function doAnalysis(manual) {
         const solve = await solver(board, options);  // look for solutions
         const hints = solve.actions;
 
-        justPressedAnalyse = true;
+        justPressedAnalyse = manual;
 
         if (manual || showHintsCheckBox.checked) {
             window.requestAnimationFrame(() => renderHints(hints, solve.other, manual || showProbabilitiesCheckbox.checked));
