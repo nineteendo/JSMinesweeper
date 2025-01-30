@@ -870,14 +870,16 @@ function renderHints(hints, otherActions, manual) {
         for (let tile of board.tiles) {
             if (tile.getHasHint() && tile.isCovered() && !tile.isFlagged() && tile.probability != null) {
                 if (!tile.colored || (tile.probability != 1 && tile.probability != 0)) {  // show the percentage unless we've already colour coded it
-                    if (tile.colored || !tile.isSolverFoundBomb() && !tile.onEdge || !manual && !showHintsCheckBox.checked) {
-                        ctxHints.fillStyle = "rgb(136, 136, 136)";
+                    if (tile.colored) {
+                        ctxHints.fillStyle = (theme == "light") ? "rgb(136, 136, 136)": "rgb(75, 75, 75)";
+                    } else if (!tile.isSolverFoundBomb() && !tile.onEdge || !manual && !showHintsCheckBox.checked) {
+                        ctxHints.fillStyle = (theme == "light") ? "rgb(136, 136, 136)": "rgb(127, 136, 143)";
                     } else if (tile.probability < 0.15) {
-                        ctxHints.fillStyle = "rgb(221, 0, 0)";
+                        ctxHints.fillStyle = (theme == "light") ? "rgb(221, 0, 0)" : "rgb(255, 119, 119)";
                     } else if (tile.probability > 0.85) {
-                        ctxHints.fillStyle = "rgb(0, 102, 0)";
+                        ctxHints.fillStyle = (theme == "light") ? "rgb(0, 102, 0)": "rgb(85, 187, 85)";
                     } else {
-                        ctxHints.fillStyle = "rgb(170, 85, 0)";
+                        ctxHints.fillStyle = (theme == "light") ? "rgb(170, 85, 0)": "rgb(204, 153, 102)";
                     }
 
                     let value;
