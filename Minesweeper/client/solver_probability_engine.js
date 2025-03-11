@@ -226,6 +226,8 @@ class ProbabilityEngine {
 
     checkForUnavoidable5050() {
 
+        this.writeToConsole("Checking for unavoidable 50/50.");
+
         const links = [];
 
         for (let i = 0; i < this.prunedWitnesses.length; i++) {
@@ -267,7 +269,7 @@ class ProbabilityEngine {
                                 if (!adjTile.isAdjacent(otherTile)) {
 
                                     //console.log("Tile " + adjTile.asText() + " is not monitoring all the other witnessed tiles");
-                                    link.trouble.push(adjTile);
+                                    link.breaker.push(adjTile);
                                     if (tile.isEqual(link.tile1)) {
                                         link.closed1 = false;
                                     } else {
@@ -324,8 +326,8 @@ class ProbabilityEngine {
                                 extension.processed = true;
                                 noMatch = false;
 
-                                // accumulate the trouble tiles as we progress;
-                                link.trouble.push(...extension.trouble);
+                                // accumulate the potential breaker tiles as we progress;
+                                link.breaker.push(...extension.breaker);
 
                                 if (openTile2 == null || !extension.tile1.isEqual(openTile2)) {
                                     extensions++;
@@ -337,7 +339,7 @@ class ProbabilityEngine {
                                     openTile2 = null;
                                 }
                                 else if (extension.closed2 || openTile2 != null && extension.tile2.isEqual(openTile2)) {
-                                    if (extensions % 2 == 0 && this.noTrouble(link, area5050)) {
+                                    if (extensions % 2 == 0 && this.noBreaker(link, area5050)) {
                                         this.writeToConsole("Tile " + openTile.asText() + " is an unavoidable guess, with " + extensions + " extensions");
                                         return this.notDead(area5050);
                                     } else {
@@ -353,8 +355,8 @@ class ProbabilityEngine {
                                 extension.processed = true;
                                 noMatch = false;
 
-                                // accumulate the trouble tiles as we progress;
-                                link.trouble.push(...extension.trouble);
+                                // accumulate the potential breaker tiles as we progress;
+                                link.breaker.push(...extension.breaker);
 
                                 if (openTile2 == null || !extension.tile1.isEqual(openTile2)) {
                                     extensions++;
@@ -366,7 +368,7 @@ class ProbabilityEngine {
                                     openTile2 = null;
                                 }
                                 else if (extension.closed1 || openTile2 != null && extension.tile1.isEqual(openTile2)) {
-                                    if (extensions % 2 == 0 && this.noTrouble(link, area5050)) {
+                                    if (extensions % 2 == 0 && this.noBreaker(link, area5050)) {
                                         this.writeToConsole("Tile " + openTile.asText() + " is an unavoidable guess, with " + extensions + " extensions");
                                         return this.notDead(area5050);
                                     } else {
@@ -395,6 +397,8 @@ class ProbabilityEngine {
 
     checkForUnavoidable5050OrPseudo() {
 
+        this.writeToConsole("Checking for unavoidable 50/50 or pseudo 50/50.");
+
         const links = [];
         const pseudoLinks = [];
 
@@ -411,12 +415,16 @@ class ProbabilityEngine {
                     link.tile1 = witness.tiles[0];
                     link.tile2 = witness.tiles[1];
 
+                    //this.writeToConsole("Tiles " + link.tile1.asText() + " and " + link.tile2.asText() + " form a simple link");
+
                     this.assessLink(link);
                     links.push(link);
 
                 } else {
                     const rooted = this.findRootedLinks(witness);
                     if (rooted.length == 0) {
+                        //this.writeToConsole("Witness " + witness.tile.asText() + " is a possible pseudo connection");
+
                         pseudoLinks.push(witness);
                     }
 
@@ -444,14 +452,15 @@ class ProbabilityEngine {
         //let area5050 = [];
         const chains = [];
 
-        // try and connect 2 or links together to form an unavoidable 50/50
+        // try and connect 2 or more links together to form an unavoidable 50/50
         for (let link of links) {
-            if (!link.processed && (!link.closed2 || !link.closed1)) {
+            //if (!link.processed && (!link.closed2 && link.closed1 || !link.closed1 && link.closed2)) {  // one end open and one closed
+            if (!link.processed && (!link.closed1 || !link.closed2)) {  // at least one end open
 
                 const chain = new Chain();
                 chain.whole5050.push(link.tile1);
                 chain.whole5050.push(link.tile2);
-                chain.trouble.push(...link.trouble);
+                chain.breaker.push(...link.breaker);
 
                 if (link.pseudo) {
                     chain.pseudo = true;
@@ -492,6 +501,9 @@ class ProbabilityEngine {
                         if (!extension.processed && !(chain.pseudo && extension.pseudo)) {  // can't add another pseudo link to an already pseudo chain
 
                             if (extension.tile1.isEqual(chain.openTile)) {
+
+                                //this.writeToConsole("Tile " + extension.tile1.asText() + " extends the current chain");
+
                                 extension.processed = true;
                                 noMatch = false;
 
@@ -506,8 +518,8 @@ class ProbabilityEngine {
                                     }
                                 }
 
-                                // accumulate the trouble tiles as we progress;
-                                chain.trouble.push(...extension.trouble);
+                                // accumulate the potential breaker tiles as we progress;
+                                chain.breaker.push(...extension.breaker);
 
                                 if (chain.openTile2 == null || !extension.tile2.isEqual(chain.openTile2)) {
                                     extensions++;
@@ -523,7 +535,7 @@ class ProbabilityEngine {
                                     chain.openTile2 = null;
                                 }
                                 else if (extension.closed2 || chain.openTile2 != null && extension.tile2.isEqual(chain.openTile2)) {
-                                    if (extensions % 2 == 0 && this.noTrouble(chain, chain.whole5050)) {
+                                    if (extensions % 2 == 0 && this.noBreaker(chain, chain.whole5050)) {
                                         this.writeToConsole("Tile " + chain.openTile.asText() + " is an unavoidable guess, with " + extensions + " extensions");
 
                                         if (extension.pseudo) {
@@ -544,6 +556,9 @@ class ProbabilityEngine {
                                 break;
                             }
                             if (extension.tile2.isEqual(chain.openTile)) {
+
+                                //this.writeToConsole("Tile " + extension.tile2.asText() + " extends the current chain");
+
                                 extension.processed = true;
                                 noMatch = false;
 
@@ -558,8 +573,8 @@ class ProbabilityEngine {
                                     }
                                 }
 
-                                // accumulate the trouble tiles as we progress;
-                                chain.trouble.push(...extension.trouble);
+                                // accumulate the potential breaker tiles as we progress;
+                                chain.breaker.push(...extension.breaker);
 
                                 if (chain.openTile2 == null || !extension.tile1.isEqual(chain.openTile2)) {
                                     extensions++;
@@ -575,7 +590,7 @@ class ProbabilityEngine {
                                     chain.openTile2 = null;
                                 }
                                 else if (extension.closed1 || chain.openTile2 != null && extension.tile1.isEqual(chain.openTile2)) {
-                                    if (extensions % 2 == 0 && this.noTrouble(chain, chain.whole5050)) {
+                                    if (extensions % 2 == 0 && this.noBreaker(chain, chain.whole5050)) {
                                         this.writeToConsole("Tile " + chain.openTile.asText() + " is an unavoidable guess, with " + extensions + " extensions");
 
                                         if (extension.pseudo) {
@@ -602,9 +617,29 @@ class ProbabilityEngine {
 
                     }
 
+                    // if we didn't match open tile 1 but open tile 2 is still unprocessed then go back and see if we can extend that.
+                    if (noMatch && chain.openTile2 != null && !chain.secondPass) {
+
+                        //this.writeToConsole("Tile " + chain.openTile2.asText() + " will now be processed");
+
+                        // swap them over
+                        const temp = chain.openTile;
+                        chain.openTile = chain.openTile2;
+                        chain.openTile2 = temp;
+
+                        chain.secondPass = true;
+                        noMatch = false;
+                    }
+
                 }
 
                 if (noMatch && chain.openTile2 == null) {
+                    let openTile1 = "null";
+                    if (chain.openTile != null) {
+                        openTile1 = chain.openTile.asText();
+                    }
+
+                    this.writeToConsole("Tile " + openTile1 + " is the open end of a chain consisting of " + (chain.whole5050.length) + " tiles");
                     chains.push(chain);
                 }
 
@@ -650,9 +685,9 @@ class ProbabilityEngine {
                 combinedChain.whole5050.push(...chain1.whole5050);
                 combinedChain.whole5050.push(...chain2.whole5050);
 
-                combinedChain.trouble.push(...linker.trouble);
-                combinedChain.trouble.push(...chain1.trouble);
-                combinedChain.trouble.push(...chain2.trouble);
+                combinedChain.breaker.push(...linker.breaker);
+                combinedChain.breaker.push(...chain1.breaker);
+                combinedChain.breaker.push(...chain2.breaker);
 
                 // If both chains are pseudos then make sure the chosen tile is the safest
                 if (chain1.pseudo && chain2.pseudo) {
@@ -669,7 +704,7 @@ class ProbabilityEngine {
                     }
                 }
 
-                if (combinedChain.whole5050.length % 2 == 0 && this.noTrouble(combinedChain, combinedChain.whole5050)) {
+                if (combinedChain.whole5050.length % 2 == 0 && this.noBreaker(combinedChain, combinedChain.whole5050)) {
                     if (tally1 == tally2) {
                         return this.notDead([chain1.openTile, chain2.openTile]);
                     } else if (tally1 < tally2) {
@@ -763,7 +798,7 @@ class ProbabilityEngine {
                         if (!adjTile.isAdjacent(otherTile)) {
 
                             //console.log("Tile " + adjTile.asText() + " is not monitoring all the other witnessed tiles");
-                            link.trouble.push(adjTile);
+                            link.breaker.push(adjTile);
                             if (tile.isEqual(link.tile1)) {
                                 link.closed1 = false;
                             } else {
@@ -816,16 +851,26 @@ class ProbabilityEngine {
 
     }
 
+    isNewMine(tile) {
 
+        for (let mine of this.minesFound) {
+            if (mine.isEqual(tile)) {
+                return true;
+            }
+        }
 
-    noTrouble(link, area) {
+        return false;
 
-        // each trouble location must be adjacent to 2 tiles in the extended 50/50
-        top: for (let tile of link.trouble) {
+    }
+
+    noBreaker(link, area) {
+
+        // each potential breaker location must be adjacent to 2 tiles in the extended 50/50
+        top: for (let tile of link.breaker) {
 
             for (let tile5050 of area) {
                 if (tile.isEqual(tile5050)) {
-                    continue top;    //if a trouble tile is part of the 50/50 it isn't trouble
+                    continue top;    //if a breaker tile is part of the 50/50 it can't break it
                 }
             }
 
@@ -837,7 +882,7 @@ class ProbabilityEngine {
                 }
             }
             if (adjCount % 2 !=0) {
-                this.writeToConsole("Trouble Tile " + tile.asText() + " isn't adjacent to an even number of tiles in the extended candidate 50/50, adjacent " + adjCount + " of " + area.length);
+                this.writeToConsole("Tile " + tile.asText() + " breaks the 50/50 as it isn't adjacent to an even number of tiles in the extended candidate 50/50, adjacent " + adjCount + " of " + area.length);
                 return false;
             }
         }
@@ -1642,6 +1687,7 @@ class ProbabilityEngine {
         const edgeWitnesses = new Set();
 
         let everything = true;
+        let allMines = true;
 
         // load each tile on this edge into a set
         for (let i = 0; i < this.mask.length; i++) {
@@ -2396,7 +2442,7 @@ class Link {
         this.pseudo = false;
         this.unavoidable = true;
 
-        this.trouble = [];
+        this.breaker = [];
 
         Object.seal(this); // prevent new values being created
     }
@@ -2414,9 +2460,11 @@ class Chain {
 
         this.openTile = null;
         this.openTile2 = null;
+
+        this.secondPass = false;
         this.pseudo = false;
 
-        this.trouble = [];
+        this.breaker = [];
 
         Object.seal(this); // prevent new values being created
     }

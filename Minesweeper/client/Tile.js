@@ -27,6 +27,9 @@ class Tile {
 		this.efficiencyProbability = 0;  // the probability of being that value
 		this.efficiencyText = "";  
 
+		this.winRate = 0;   // win rate as determined by the Brute force analysis
+		this.winRateText = "";  
+
 		// is there an mine adjacent to this tile?  Set as part of the No flag efficiency logic
 		this.adjacentMine = false;
 
@@ -79,7 +82,7 @@ class Tile {
         if (!this.hasHint) {
             return "";
 		} else {
-			return this.hintText + this.efficiencyText;
+			return this.hintText + this.efficiencyText + this.winRateText;
         }
 
     }
@@ -93,7 +96,7 @@ class Tile {
         this.hasHint = true;
 
 		if (prob == 1) {
-			this.hintText = "Clear";
+			this.hintText = "Safe";
 		} else if (prob == 0) {
 			this.hintText = "Mine";
 		} else if (progress == null) {
@@ -111,6 +114,12 @@ class Tile {
 		this.efficiencyText = "\n" + (probability * 100).toFixed(2) + "% value '" + value + "'"
 	}
 
+	setWinRate(winRate) {
+		this.winRate = winRate;
+
+		this.winRateText = "\n" + (winRate * 100).toFixed(2) + "% solve rate";
+	}
+
     //getProbability() {
     //    return this.probability;
     //}
@@ -123,6 +132,8 @@ class Tile {
 		this.efficiencyProbability = 0;
 		this.efficiencyText = "";
 		this.probability = -1;
+		this.winRate = 0;
+		this.winRateText = "";
     }
 
     setOnEdge() {
