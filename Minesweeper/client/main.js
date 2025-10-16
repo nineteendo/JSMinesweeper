@@ -67,6 +67,8 @@ const autoPlayCheckBox = document.getElementById("autoplay");
 const showHintsCheckBox = document.getElementById("showhints");
 const showProbabilitiesCheckbox = document.getElementById("showprobabilities");
 const acceptGuessesCheckBox = document.getElementById("acceptguesses");
+const autoRetryCheckBox = document.getElementById("autoretry");
+const useSeed = document.getElementById("useSeed");
 const seedText = document.getElementById("seed");
 const gameTypeSafe = document.getElementById("gameTypeSafe");
 const gameTypeZero = document.getElementById("gameTypeZero");
@@ -3393,6 +3395,13 @@ async function sendActionsMessage(message) {
     // update the mine count if a flag has changed
     if (prevMineCounter != board.bombs_left) {
         window.requestAnimationFrame(() => updateMineCount(board.bombs_left));
+    }
+
+    if (board.isGameover() && !board.won && autoRetryCheckBox.checked && !useSeed.checked) {
+        renderTiles(tiles);
+        renderHints([]);
+        setTimeout(apply, 1000);
+        return;
     }
 
     // update the graphical board
