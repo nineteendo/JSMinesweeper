@@ -2225,8 +2225,10 @@ async function replayForward(replayType) {
             options.playStyle = PLAY_STYLE_NOFLAGS;
         } else if (docPlayStyle.value == "eff") {
             options.playStyle = PLAY_STYLE_EFFICIENCY;
-        } else {
+        } else if (docPlayStyle.value == "nfeff") {
             options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY;
+        } else {
+            options.playStyle = PLAY_STYLE_RISKY_EFFICIENCY;
         }
 
         options.fullProbability = true;
@@ -2438,8 +2440,10 @@ async function replayBackward(replayType) {
                 options.playStyle = PLAY_STYLE_NOFLAGS;
             } else if (docPlayStyle.value == "eff") {
                 options.playStyle = PLAY_STYLE_EFFICIENCY;
-            } else {
+            } else if (docPlayStyle.value == "nfeff") {
                 options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY;
+            } else {
+                options.playStyle = PLAY_STYLE_RISKY_EFFICIENCY;
             }
 
             options.fullProbability = true;
@@ -2573,9 +2577,11 @@ async function doAnalysis(manual) {
             options.playStyle = PLAY_STYLE_NOFLAGS;
         } else if (docPlayStyle.value == "eff") {
             options.playStyle = PLAY_STYLE_EFFICIENCY;
+        } else if (docPlayStyle.value == "nfeff") {
+            options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY;
         } else {
-            options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY; 
-        } 
+            options.playStyle = PLAY_STYLE_RISKY_EFFICIENCY;
+        }
 
         options.fullProbability = true;
         options.guessPruning = guessAnalysisPruning;
@@ -3445,9 +3451,11 @@ async function handleSolver(solverStart, headerId) {
             options.playStyle = PLAY_STYLE_NOFLAGS;
         } else if (docPlayStyle.value == "eff") {
             options.playStyle = PLAY_STYLE_EFFICIENCY;
-        } else {
+        } else if (docPlayStyle.value == "nfeff") {
             options.playStyle = PLAY_STYLE_NOFLAGS_EFFICIENCY;
-        } 
+        } else {
+            options.playStyle = PLAY_STYLE_RISKY_EFFICIENCY;
+        }
 
         options.fullProbability = true;
         options.hardcore = docHardcore.checked;
